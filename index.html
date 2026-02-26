@@ -767,7 +767,7 @@
     formData.append('partialResponse', `[null,null,"${fbzx}"]`);
 
     try {
-      await fetch(FORM_ACTION, { method: 'POST', body: formData });
+      await fetch(FORM_ACTION, { method: 'POST', body: formData, mode: 'no-cors' });
     } catch (err) { console.error('제출 오류:', err); }
 
     document.getElementById('progress-wrap').style.display = 'none';
