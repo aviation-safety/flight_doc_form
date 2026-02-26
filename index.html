@@ -376,8 +376,8 @@
             <span>임원</span>
           </label>
           <label class="radio-option">
-            <input type="radio" name="entry.1345793363" value="CM/지점장">
-            <span>CM/지점장</span>
+            <input type="radio" name="entry.1345793363" value="CM, 지점장 등">
+            <span>CM, 지점장 등</span>
           </label>
         </div>
       </div>
@@ -558,7 +558,7 @@
 <script>
   const SHEET_ID = '1ESOBsoDtIUMLkEAYkoYNUp_DrUXpZDNdWvc7AUETwWo';
   const GID = '1997847295';
-  const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdo3QBcGRNXhKIkFboD6MCAvN6iS9N3OMsTT6yvGS_aX7q7Qg/formResponse';
+  const FORM_ACTION = 'https://script.google.com/macros/s/AKfycbwbZUN2kuSMt9zk9g-KR032HoaC6J7H0gUuhubXmwe_JbKMYhQYLO5sdIpSPJrGsR47/exec';
 
   let submittedData = {};
   let fetchAttempts = 0;
@@ -737,30 +737,52 @@
     btn.disabled = true;
     document.getElementById('loading-text').style.display = 'inline';
 
-    // 모든 entry를 포함 (건너뛴 항목은 빈값으로)
-    // 구글 폼은 entry가 빠지면 저장 안 되므로 전부 포함해야 함
-    const allEntries = [
-      'entry.1609551810', // Q1 문서명
-      'entry.195738963',  // Q2 외부문서
-      'entry.1345793363', // Q3 전결권자
-      'entry.400947674',  // Q4 항공당국
-      'entry.1059681457', // Q5 회사공통원칙
-      'entry.1227206298', // Q6 부문합의
-      'entry.14138203',   // Q7 하위문서기준
-      'entry.1527546938', // Q8 해당항목여부
-      'entry.231438389',  // Q9 부문전체기준
-      'entry.1062350354', // Q10 관리부문
-    ];
+    // 선택된 값들 수집
+    const isExternal = form.querySelector('input[name="entry.195738963"]:checked')?.value === '예';
+    const q4val = form.querySelector('input[name="entry.400947674"]:checked')?.value;
+    const q8val = form.querySelector('input[name="entry.1527546938"]:checked')?.value;
+
+    // pageHistory: 섹션 이동 경로
+    // 섹션 ID: 0(문서명) → 1841859968(외부문서여부) → 분기
+    // 외부문서=예: 0,1,599148621,1176066238
+    // 외부문서=아니오, 항공당국=예: 0,1,11261897,1176066238
+    // 외부문서=아니오, 항공당국=아니오, 해당=예: 0,1,11261897,397488101,1176066238
+    // 외부문서=아니오, 항공당국=아니오, 해당=아니오: 0,1,11261897,397488101,118137180,1176066238
+    let pageHistory;
+    if (isExternal) {
+      pageHistory = '0,1,599148621,1176066238';
+    } else if (q4val === '예') {
+      pageHistory = '0,1,11261897,1176066238';
+    } else if (q8val === '예') {
+      pageHistory = '0,1,11261897,397488101,1176066238';
+    } else {
+      pageHistory = '0,1,11261897,397488101,118137180,1176066238';
+    }
+
+    const fbzx = Math.floor(Math.random() * 9e18).toString();
+
     const formData = new FormData();
-    allEntries.forEach(name => {
-      const input = form.querySelector(`input[name="${name}"]:checked`) ||
-                    form.querySelector(`input[name="${name}"][type="text"]`);
-      formData.append(name, input ? input.value : '');
-    });
+    // 응답 entry들
+    formData.append('entry.1609551810', document.getElementById('q1').value.trim());
+    formData.append('entry.195738963',  form.querySelector('input[name="entry.195738963"]:checked')?.value  || '');
+    formData.append('entry.1345793363', form.querySelector('input[name="entry.1345793363"]:checked')?.value || '');
+    formData.append('entry.400947674',  form.querySelector('input[name="entry.400947674"]:checked')?.value  || '');
+    formData.append('entry.1059681457', form.querySelector('input[name="entry.1059681457"]:checked')?.value || '');
+    formData.append('entry.1227206298', form.querySelector('input[name="entry.1227206298"]:checked')?.value || '');
+    formData.append('entry.14138203',   form.querySelector('input[name="entry.14138203"]:checked')?.value   || '');
+    formData.append('entry.1527546938', form.querySelector('input[name="entry.1527546938"]:checked')?.value || '');
+    formData.append('entry.231438389',  form.querySelector('input[name="entry.231438389"]:checked')?.value  || '');
+    formData.append('entry.1062350354', form.querySelector('input[name="entry.1062350354"]:checked')?.value || '');
+    // 구글 폼 필수 hidden 필드
+    formData.append('fvv', '1');
+    formData.append('fbzx', fbzx);
+    formData.append('pageHistory', pageHistory);
+    formData.append('submissionTimestamp', '-1');
+    formData.append('partialResponse', `[null,null,"${fbzx}"]`);
 
     try {
-      await fetch(FORM_ACTION, { method: 'POST', body: formData, mode: 'no-cors' });
-    } catch (err) { /* no-cors opaque — 무시 */ }
+      await fetch(FORM_ACTION, { method: 'POST', body: formData });
+    } catch (err) { console.error('제출 오류:', err); }
 
     document.getElementById('progress-wrap').style.display = 'none';
     document.getElementById('form-screen').style.display = 'none';
