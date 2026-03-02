@@ -2,213 +2,184 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>비행안전문서 관리번호 생성</title>
+  <title>비행안전문서 관리번호 생성 시스템</title>
   <style>
-    /* 사용자님의 고유 디자인 유지 */
+    /* 디자인: Google Forms 스타일 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 16px; }
-    .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); width: 100%; max-width: 640px; padding: 36px 40px; margin-bottom: 24px; }
-    .card-header { border-top: 8px solid #1a73e8; border-radius: 12px 12px 0 0; margin: -36px -40px 28px; padding: 28px 40px 20px; }
-    h1 { font-size: 26px; font-weight: 600; color: #202124; margin-bottom: 10px; }
-    .description { font-size: 14px; color: #5f6368; line-height: 1.6; }
-    .question-block { margin-bottom: 28px; overflow: hidden; transition: opacity 0.25s ease, max-height 0.35s ease; }
-    .question-block.hidden { max-height: 0 !important; opacity: 0; margin-bottom: 0; pointer-events: none; }
-    .question-block.visible { max-height: 1000px; opacity: 1; }
-    .question-label { font-size: 15px; font-weight: 500; color: #202124; margin-bottom: 12px; }
-    .required-mark { color: #d93025; margin-left: 3px; }
-    input[type="text"] { width: 100%; border: none; border-bottom: 1px solid #dadce0; padding: 8px 0; font-size: 15px; outline: none; transition: border-color 0.2s; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; padding: 40px 20px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 640px; margin: 0 auto 20px; padding: 30px; }
+    .card-header { border-top: 8px solid #1a73e8; margin: -30px -30px 20px; padding: 20px 30px; border-radius: 12px 12px 0 0; }
+    h1 { font-size: 24px; color: #202124; }
+    .question-block { margin-bottom: 25px; transition: all 0.3s ease; }
+    /* 핵심: 초기 상태는 모두 숨김 */
+    .hidden { display: none !important; opacity: 0; }
+    .visible { display: block !important; opacity: 1; }
+    .question-label { font-weight: 600; margin-bottom: 12px; display: block; }
+    input[type="text"] { width: 100%; border: none; border-bottom: 1px solid #dadce0; padding: 8px 0; outline: none; font-size: 16px; }
     input[type="text"]:focus { border-bottom: 2px solid #1a73e8; }
-    .radio-group { display: flex; flex-direction: column; gap: 10px; }
-    .radio-option { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 4px; border-radius: 6px; }
-    .radio-option:hover { background: #f8f9fa; }
-    .submit-btn { background: #1a73e8; color: white; border: none; border-radius: 6px; padding: 12px 32px; font-size: 15px; cursor: pointer; }
-    .submit-btn:disabled { background: #dadce0; }
-    #result-screen { display: none; width: 100%; max-width: 640px; text-align: center; }
-    .result-code-box { background: #e8f0fe; border: 2px solid #1a73e8; border-radius: 10px; padding: 24px; margin: 20px 0; }
-    .result-code-value { font-size: 32px; font-weight: 700; color: #1a73e8; font-family: monospace; }
+    .radio-option { display: block; margin: 10px 0; cursor: pointer; }
+    .submit-btn { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    #result-screen { display: none; text-align: center; }
+    .result-box { background: #e8f0fe; border: 2px solid #1a73e8; padding: 20px; border-radius: 8px; margin: 20px 0; font-size: 28px; font-weight: bold; color: #1a73e8; }
   </style>
 </head>
 <body>
 
 <div id="form-screen">
   <div class="card">
-    <div class="card-header">
-      <h1>비행안전문서 관리번호 생성</h1>
-      <p class="description">입력된 조건에 따라 관리번호가 자동 생성되어 구글 시트에 기록됩니다.</p>
-    </div>
-
+    <div class="card-header"><h1>문서 관리번호 생성</h1></div>
     <form id="doc-form">
       <div class="question-block visible" id="block-q1">
-        <div class="question-label">1. 문서명을 작성해주세요 <span class="required-mark">*</span></div>
-        <input type="text" id="q1" name="q1" placeholder="문서명 입력" required>
+        <label class="question-label">1. 문서명을 입력하세요 *</label>
+        <input type="text" id="q1" name="q1" required placeholder="예: 운항기술지시서">
       </div>
 
       <div class="question-block hidden" id="block-q2">
-        <div class="question-label">2. 이 문서는 외부 문서인가? <span class="required-mark">*</span></div>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="q2" value="예"> <span>예 (외부문서)</span></label>
-          <label class="radio-option"><input type="radio" name="q2" value="아니오"> <span>아니오 (내부문서)</span></label>
-        </div>
+        <label class="question-label">2. 이 문서는 외부 문서인가요? *</label>
+        <label class="radio-option"><input type="radio" name="q2" value="예"> 예</label>
+        <label class="radio-option"><input type="radio" name="q2" value="아니오"> 아니오</label>
       </div>
 
       <div class="question-block hidden" id="block-q3">
-        <div class="question-label">3. 이 문서는 항공당국 및 관계기관 신고/인가 문서인가요? <span class="required-mark">*</span></div>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="q3" value="예"> <span>예</span></label>
-          <label class="radio-option"><input type="radio" name="q3" value="아니오"> <span>아니오</span></label>
-        </div>
+        <label class="question-label">3. 항공당국 신고/인가 문서인가요? *</label>
+        <label class="radio-option"><input type="radio" name="q3" value="예"> 예</label>
+        <label class="radio-option"><input type="radio" name="q3" value="아니오"> 아니오</label>
       </div>
 
       <div id="group-internal" class="hidden">
-        <div class="question-block visible"><div class="question-label">5. 회사 전반 공통 원칙을 정하는가?</div>
-          <div class="radio-group"><label class="radio-option"><input type="radio" name="q5" value="예"><span>예</span></label><label class="radio-option"><input type="radio" name="q5" value="아니오"><span>아니오</span></label></div>
-        </div>
-        <div class="question-block visible"><div class="question-label">6. 2개 이상 부문의 합의가 필수인가?</div>
-          <div class="radio-group"><label class="radio-option"><input type="radio" name="q6" value="예"><span>예</span></label><label class="radio-option"><input type="radio" name="q6" value="아니오"><span>아니오</span></label></div>
-        </div>
-        <div class="question-block visible"><div class="question-label">7. 하위 문서의 상위 기준이 되는가?</div>
-          <div class="radio-group"><label class="radio-option"><input type="radio" name="q7" value="예"><span>예</span></label><label class="radio-option"><input type="radio" name="q7" value="아니오"><span>아니오</span></label></div>
-        </div>
-        <div class="question-block visible" id="block-q8"><div class="question-label">8. 상기 질문 중 하나라도 해당 항목이 있었습니까? <span class="required-mark">*</span></div>
-          <div class="radio-group"><label class="radio-option"><input type="radio" name="q8" value="예"><span>예</span></label><label class="radio-option"><input type="radio" name="q8" value="아니오"><span>아니오</span></label></div>
-        </div>
+        <div class="question-block visible"><label class="question-label">5. 회사 전반 공통 원칙인가요?</label>
+          <label class="radio-option"><input type="radio" name="q5" value="예"> 예</label><label class="radio-option"><input type="radio" name="q5" value="아니오"> 아니오</label></div>
+        <div class="question-block visible"><label class="question-label">6. 2개 이상 부문 합의가 필수인가요?</label>
+          <label class="radio-option"><input type="radio" name="q6" value="예"> 예</label><label class="radio-option"><input type="radio" name="q6" value="아니오"> 아니오</label></div>
+        <div class="question-block visible"><label class="question-label">7. 하위 문서의 상위 기준인가요?</label>
+          <label class="radio-option"><input type="radio" name="q7" value="예"> 예</label><label class="radio-option"><input type="radio" name="q7" value="아니오"> 아니오</label></div>
+        <div class="question-block visible" id="block-q8"><label class="question-label">8. 상기 질문 중 하나라도 해당하나요? *</label>
+          <label class="radio-option"><input type="radio" name="q8" value="예"> 예</label><label class="radio-option"><input type="radio" name="q8" value="아니오"> 아니오</label></div>
       </div>
 
       <div class="question-block hidden" id="block-q9">
-        <div class="question-label">9. 특정 부문 전체에 공통으로 적용되는 기준인가? <span class="required-mark">*</span></div>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="q9" value="예"> <span>예</span></label>
-          <label class="radio-option"><input type="radio" name="q9" value="아니오"> <span>아니오</span></label>
-        </div>
+        <label class="question-label">9. 특정 부문 전체 공통 기준인가요? *</label>
+        <label class="radio-option"><input type="radio" name="q9" value="예"> 예</label>
+        <label class="radio-option"><input type="radio" name="q9" value="아니오"> 아니오</label>
       </div>
 
       <div class="question-block hidden" id="block-q4">
-        <div class="question-label">4. 이 문서의 전결권자는 누구인가요? <span class="required-mark">*</span></div>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="q4" value="대표이사"> <span>대표이사</span></label>
-          <label class="radio-option"><input type="radio" name="q4" value="임원"> <span>임원</span></label>
-          <label class="radio-option"><input type="radio" name="q4" value="CM, 지점장 등"> <span>CM, 지점장 등</span></label>
-        </div>
+        <label class="question-label">4. 이 문서의 전결권자는? *</label>
+        <label class="radio-option"><input type="radio" name="q4" value="대표이사"> 대표이사</label>
+        <label class="radio-option"><input type="radio" name="q4" value="임원"> 임원</label>
+        <label class="radio-option"><input type="radio" name="q4" value="본부장"> 본부장</label>
       </div>
 
       <div class="question-block hidden" id="block-q10">
-        <div class="question-label">10. 이 문서를 관리하는 부문은 어디인가요? <span class="required-mark">*</span></div>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="q10" value="OY"> <span>OY</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="DO"> <span>DO</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="DU"> <span>DU</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="DM"> <span>DM</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="FB"> <span>FB</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="DC"> <span>DC</span></label>
-          <label class="radio-option"><input type="radio" name="q10" value="OC"> <span>OC</span></label>
-        </div>
+        <label class="question-label">10. 관리 부문을 선택하세요 *</label>
+        <select name="q10" id="q10" style="width:100%; padding:8px;">
+          <option value="">-- 선택하세요 --</option>
+          <option value="OY">OY</option><option value="DO">DO</option><option value="DU">DU</option>
+          <option value="DM">DM</option><option value="FB">FB</option><option value="DC">DC</option><option value="OC">OC</option>
+        </select>
       </div>
 
-      <div style="margin-top:20px; display:none;" id="submit-row">
-        <button type="submit" class="submit-btn" id="submit-btn">제출 및 번호 생성</button>
+      <div id="submit-area" class="hidden">
+        <button type="submit" class="submit-btn" id="btn-submit">제출 및 번호 생성</button>
       </div>
     </form>
   </div>
 </div>
 
-<div id="result-screen">
-  <div class="card">
-    <div class="card-header"><h1>생성 완료</h1></div>
-    <div class="result-code-box">
-      <div style="font-size:12px; color:#1a73e8; margin-bottom:8px;">관리번호 기본코드</div>
-      <div class="result-code-value" id="result-code">생성 중...</div>
-    </div>
-    <button class="submit-btn" onclick="location.reload()">새 문서 등록</button>
-  </div>
+<div id="result-screen" class="card">
+  <h2>관리번호 생성 완료</h2>
+  <div class="result-box" id="final-code">조회 중...</div>
+  <button class="submit-btn" onclick="location.reload()">새로 만들기</button>
 </div>
 
 <script>
-  // 🔴 반드시 사용자님의 구글 앱스 스크립트 웹 앱 URL로 변경하세요!
+  // ⚠️ 본인의 웹 앱 URL과 시트 정보로 수정하세요
   const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw-1zqW_Ki9-621sXC9qY3hQUy1lsR76vXPOwGIBOCnIGi84KTpdPsB3rGz8OaMv94E/exec';
   const SHEET_ID = '1ESOBsoDtIUMLkEAYkoYNUp_DrUXpZDNdWvc7AUETwWo';
   const GID = '1997847295';
 
   const form = document.getElementById('doc-form');
-  function show(id) { const el = document.getElementById(id); if(el){ el.classList.remove('hidden'); el.classList.add('visible'); } }
-  function hide(id) { const el = document.getElementById(id); if(el){ el.classList.remove('visible'); el.classList.add('hidden'); } }
+  const q1Input = document.getElementById('q1');
 
-  // [중요] 사용자님이 요청하신 정밀 화면 전환 로직
-  form.addEventListener('input', () => {
+  // 화면 전환 로직 함수
+  function updateFlow() {
     const fd = new FormData(form);
-    const q1 = document.getElementById('q1').value;
-    const q2 = fd.get('q2'); // 외부문서여부
-    const q3 = fd.get('q3'); // 항공당국여부
-    const q4 = fd.get('q4'); // 전결권자
-    const q8 = fd.get('q8'); // 8번 답변
-    const q9 = fd.get('q9'); // 9번 답변
-    const q10 = fd.get('q10'); // 관리부문
+    const q1 = q1Input.value.trim();
+    const q2 = fd.get('q2');
+    const q3 = fd.get('q3');
+    const q4 = fd.get('q4');
+    const q8 = fd.get('q8');
+    const q9 = fd.get('q9');
+    const q10 = fd.get('q10');
 
-    if (q1.trim()) show('block-q2');
+    // 1 -> 2
+    if(q1) document.getElementById('block-q2').classList.replace('hidden', 'visible');
 
-    if (q2 === '예') {
-      show('block-q4'); hide('block-q3'); hide('group-internal');
-    } else if (q2 === '아니오') {
-      show('block-q3'); hide('block-q4');
+    // 2번 분기
+    if(q2 === '예') {
+      document.getElementById('block-q4').classList.replace('hidden', 'visible');
+      document.getElementById('block-q3').className = 'question-block hidden';
+      document.getElementById('group-internal').className = 'hidden';
+    } else if(q2 === '아니오') {
+      document.getElementById('block-q3').classList.replace('hidden', 'visible');
+      document.getElementById('block-q4').className = 'question-block hidden';
     }
 
-    if (q2 === '아니오' && q3 === '예') {
-      show('block-q10'); hide('group-internal');
-    } else if (q2 === '아니오' && q3 === '아니오') {
-      show('group-internal'); hide('block-q10');
+    // 3번 분기
+    if(q2 === '아니오' && q3 === '예') {
+      document.getElementById('block-q10').classList.replace('hidden', 'visible');
+      document.getElementById('group-internal').className = 'hidden';
+    } else if(q2 === '아니오' && q3 === '아니오') {
+      document.getElementById('group-internal').className = 'visible';
     }
 
-    if (q4) show('block-q10');
-    if (q8) show('block-q9');
-    if (q9) show('block-q10');
-    if (q10) document.getElementById('submit-row').style.display = 'block';
-  });
+    // 8 -> 9
+    if(q8) document.getElementById('block-q9').classList.replace('hidden', 'visible');
 
-  // [중요] 구글 시트로 데이터 전송 및 결과 조회
+    // 최종 10번 노출 조건
+    if(q4 || (q2 === '아니오' && q3 === '예') || q9) {
+      document.getElementById('block-q10').classList.replace('hidden', 'visible');
+    }
+
+    // 제출 버튼
+    if(q10) document.getElementById('submit-area').classList.replace('hidden', 'visible');
+  }
+
+  form.addEventListener('input', updateFlow);
+  form.addEventListener('change', updateFlow);
+
+  // 구글 시트 저장 및 결과 조회
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = "처리 중...";
+    document.getElementById('btn-submit').disabled = true;
+    document.getElementById('btn-submit').textContent = "시트 저장 중...";
 
-    const fd = new FormData(form);
-    
     try {
-      // 1. 데이터 POST 전송
+      // 1. 시트로 전송 (POST)
       await fetch(WEB_APP_URL, {
         method: 'POST',
         mode: 'no-cors',
-        body: new URLSearchParams(fd)
+        body: new URLSearchParams(new FormData(form))
       });
 
       // 2. 화면 전환
       document.getElementById('form-screen').style.display = 'none';
       document.getElementById('result-screen').style.display = 'block';
 
-      // 3. 시트에서 관리번호(Q열) 읽어오기 (약간의 딜레이 후 조회)
-      setTimeout(fetchFinalCode, 3000);
-    } catch (err) {
-      alert("전송 중 오류가 발생했습니다.");
-      btn.disabled = false;
+      // 3. 3초 뒤에 시트 Q열 데이터 가져오기
+      setTimeout(async () => {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+        const res = await fetch(url);
+        const text = await res.text();
+        const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+        const row = json.table.rows[json.table.rows.length - 1];
+        document.getElementById('final-code').textContent = row.c[16] ? row.c[16].v : "생성 실패";
+      }, 3000);
+
+    } catch(err) {
+      alert("오류 발생: " + err);
     }
   });
-
-  async function fetchFinalCode() {
-    try {
-      // 구글 시트 시각화 API를 사용하여 마지막 행의 데이터 조회
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
-      const response = await fetch(url);
-      const text = await response.text();
-      const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-      const lastRow = json.table.rows[json.table.rows.length - 1];
-      
-      // Q열(17번째 열 = index 16)의 값 출력
-      const finalCode = lastRow.c[16] ? lastRow.c[16].v : "생성 중...";
-      document.getElementById('result-code').textContent = finalCode;
-    } catch (e) {
-      document.getElementById('result-code').textContent = "조회 실패(시트 확인 요망)";
-    }
-  }
 </script>
 </body>
 </html>
