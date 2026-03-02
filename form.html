@@ -3,323 +3,260 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>비행안전문서 관리번호 생성기</title>
+  <title>비행안전문서 관리번호 생성</title>
   <style>
-    :root {
-      --primary: #1a73e8;
-      --bg: #f0f4f8;
-      --text: #202124;
-      --subtext: #5f6368;
-      --border: #dadce0;
-    }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 16px;
-    }
-
-    /* Progress Bar */
-    .progress-wrap { width: 100%; max-width: 640px; margin-bottom: 20px; }
-    .progress-bg { background: #e8eaed; height: 6px; border-radius: 3px; overflow: hidden; }
-    .progress-fill { background: var(--primary); height: 100%; width: 10%; transition: 0.4s ease; }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 640px;
-      padding: 40px;
-      transition: 0.3s;
-    }
-
-    .card-header { border-top: 10px solid var(--primary); margin: -40px -40px 30px; border-radius: 12px 12px 0 0; padding: 30px 40px 10px; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    .desc { font-size: 14px; color: var(--subtext); margin-bottom: 20px; }
-
-    /* Question Styles */
-    .q-block { margin-bottom: 35px; display: none; animation: fadeIn 0.5s ease forwards; }
-    .q-block.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .q-label { font-size: 16px; font-weight: 500; margin-bottom: 15px; display: block; }
-    .required { color: #d93025; margin-left: 4px; }
-
-    input[type="text"] {
-      width: 100%;
-      border: none;
-      border-bottom: 2px solid var(--border);
-      padding: 10px 0;
-      font-size: 16px;
-      outline: none;
-      transition: 0.3s;
-    }
-    input[type="text"]:focus { border-bottom-color: var(--primary); }
-
-    .radio-group { display: flex; flex-direction: column; gap: 12px; }
-    .radio-opt {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .radio-opt:hover { background: #f8f9fa; }
-    .radio-opt input { margin-right: 15px; width: 18px; height: 18px; accent-color: var(--primary); }
-
-    .btn-submit {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px 30px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      display: none;
-      margin-top: 20px;
-    }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-
-    /* Result Screen */
-    #result-screen { display: none; text-align: center; }
-    .code-box {
-      background: #e8f0fe;
-      border: 2px dashed var(--primary);
-      padding: 30px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-    .code-val { font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: 2px; }
-    .info-table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; }
-    .info-table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--primary);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    body { font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 16px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); width: 100%; max-width: 640px; padding: 36px 40px; margin-bottom: 24px; }
+    .card-header { border-top: 8px solid #1a73e8; border-radius: 12px 12px 0 0; margin: -36px -40px 28px; padding: 28px 40px 20px; }
+    h1 { font-size: 26px; font-weight: 600; color: #202124; margin-bottom: 10px; }
+    .description { font-size: 14px; color: #5f6368; line-height: 1.6; }
+    .question-block { margin-bottom: 28px; overflow: hidden; transition: opacity 0.25s ease, max-height 0.35s ease, margin-bottom 0.35s ease; }
+    .question-block.hidden { max-height: 0 !important; opacity: 0; margin-bottom: 0; pointer-events: none; }
+    .question-block.visible { max-height: 500px; opacity: 1; }
+    .question-label { font-size: 15px; font-weight: 500; color: #202124; margin-bottom: 12px; line-height: 1.5; }
+    .required-mark { color: #d93025; margin-left: 3px; }
+    input[type="text"] { width: 100%; border: none; border-bottom: 1px solid #dadce0; padding: 8px 0; font-size: 15px; color: #202124; outline: none; transition: border-color 0.2s; background: transparent; }
+    input[type="text"]:focus { border-bottom: 2px solid #1a73e8; }
+    .radio-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-option { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 4px; border-radius: 6px; transition: background 0.15s; }
+    .radio-option:hover { background: #f8f9fa; }
+    .radio-option input[type="radio"] { width: 18px; height: 18px; accent-color: #1a73e8; cursor: pointer; flex-shrink: 0; }
+    .radio-option span { font-size: 14px; color: #3c4043; }
+    .submit-btn { background: #1a73e8; color: white; border: none; border-radius: 6px; padding: 12px 32px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+    .submit-btn:disabled { background: #dadce0; cursor: not-allowed; }
+    .btn-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+    .loading-text { font-size: 14px; color: #5f6368; display: none; }
+    #result-screen { display: none; width: 100%; max-width: 640px; }
+    .result-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 40px; text-align: center; }
+    .result-icon { font-size: 48px; margin-bottom: 16px; }
+    .result-title { font-size: 20px; font-weight: 600; color: #202124; margin-bottom: 8px; }
+    .result-subtitle { font-size: 14px; color: #5f6368; margin-bottom: 32px; }
+    .result-code-box { background: #e8f0fe; border: 2px solid #1a73e8; border-radius: 10px; padding: 24px; margin-bottom: 28px; }
+    .result-code-label { font-size: 12px; font-weight: 600; color: #1a73e8; text-transform: uppercase; margin-bottom: 10px; }
+    .result-code-value { font-size: 32px; font-weight: 700; color: #1a73e8; letter-spacing: 2px; font-family: 'Courier New', monospace; }
+    .result-loading { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 0; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #e8f0fe; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .doc-info-table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; font-size: 13px; }
+    .doc-info-table td { padding: 8px 12px; border-bottom: 1px solid #f1f3f4; color: #5f6368; }
+    .doc-info-table td:first-child { font-weight: 500; color: #3c4043; width: 40%; }
+    .progress-bar-wrap { width: 100%; max-width: 640px; margin-bottom: 16px; }
+    .progress-bar-bg { background: #e8eaed; border-radius: 4px; height: 4px; overflow: hidden; }
+    .progress-bar-fill { background: #1a73e8; height: 100%; width: 0%; transition: width 0.4s ease; }
+    .progress-label { font-size: 12px; color: #5f6368; margin-top: 6px; text-align: right; }
   </style>
 </head>
 <body>
 
-  <div class="progress-wrap" id="p-wrap">
-    <div class="progress-bg"><div class="progress-fill" id="p-fill"></div></div>
-  </div>
+<div class="progress-bar-wrap" id="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+  <div class="progress-label" id="progress-label">0 / 8 단계</div>
+</div>
 
-  <div class="card" id="form-card">
+<div id="form-screen">
+  <div class="card">
     <div class="card-header">
       <h1>비행안전문서 관리번호 생성</h1>
-      <p class="desc">문서 정보를 입력하면 시트 수식에 의해 번호가 자동 생성됩니다.</p>
+      <p class="description">정보를 입력하면 관리번호가 자동 생성됩니다.</p>
     </div>
 
-    <form id="main-form">
-      <div class="q-block active" id="b1">
-        <label class="q-label">1. 문서명을 작성해주세요 <span class="required">*</span></label>
-        <input type="text" id="q1" placeholder="내용 입력" required>
+    <form id="doc-form">
+      <div class="question-block visible" id="block-q1">
+        <div class="question-label">1. 문서명을 작성해주세요 <span class="required-mark">*</span></div>
+        <input type="text" id="q1" name="q1" placeholder="문서명 입력" required>
       </div>
 
-      <div class="q-block" id="b2">
-        <label class="q-label">2. 이 문서는 외부 기관에서 수신한 문서인가요? <span class="required">*</span></label>
+      <div class="question-block hidden" id="block-q2">
+        <div class="question-label">2. 이 문서는 외부 기관 문서인가요? <span class="required-mark">*</span></div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="q2" value="예"> 예 (외부문서)</label>
-          <label class="radio-opt"><input type="radio" name="q2" value="아니오"> 아니오 (내부문서)</label>
+          <label class="radio-option"><input type="radio" name="q2" value="예"> <span>예 (외부문서)</span></label>
+          <label class="radio-option"><input type="radio" name="q2" value="아니오"> <span>아니오 (내부문서)</span></label>
         </div>
       </div>
 
-      <div class="q-block" id="b4">
-        <label class="q-label">3. 항공당국 및 관계기관 신고/인가 대상인가요? <span class="required">*</span></label>
+      <div class="question-block hidden" id="block-q4">
+        <div class="question-label">3. 항공당국 신고/인가 대상인가요? <span class="required-mark">*</span></div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="q4" value="예"> 예</label>
-          <label class="radio-opt"><input type="radio" name="q4" value="아니오"> 아니오</label>
+          <label class="radio-option"><input type="radio" name="q4" value="예"> <span>예</span></label>
+          <label class="radio-option"><input type="radio" name="q4" value="아니오"> <span>아니오</span></label>
         </div>
       </div>
 
-      <div id="group-internal" style="display:none;">
-        <div class="q-block active" id="b5">
-          <label class="q-label">4. 회사 전반에 적용되는 공통 원칙을 정하는가? <span class="required">*</span></label>
+      <div id="internal-questions" style="display:none;">
+        <div class="question-block visible" id="block-q5">
+          <div class="question-label">4. 회사 공통 원칙을 정하는 문서인가요? <span class="required-mark">*</span></div>
           <div class="radio-group">
-            <label class="radio-opt"><input type="radio" name="q5" value="예"> 예</label>
-            <label class="radio-opt"><input type="radio" name="q5" value="아니오"> 아니오</label>
+            <label class="radio-option"><input type="radio" name="q5" value="예"> <span>예</span></label>
+            <label class="radio-option"><input type="radio" name="q5" value="아니오"> <span>아니오</span></label>
           </div>
         </div>
-        <div class="q-block active" id="b8">
-          <label class="q-label">5. 위의 질문 중 하나라도 '예'가 있었습니까? <span class="required">*</span></label>
+        <div class="question-block visible" id="block-q8">
+          <div class="question-label">5. 위 항목 중 '예'가 하나라도 있나요? <span class="required-mark">*</span></div>
           <div class="radio-group">
-            <label class="radio-opt"><input type="radio" name="q8" value="예"> 예</label>
-            <label class="radio-opt"><input type="radio" name="q8" value="아니오"> 아니오</label>
+            <label class="radio-option"><input type="radio" name="q8" value="예"> <span>예</span></label>
+            <label class="radio-option"><input type="radio" name="q8" value="아니오"> <span>아니오</span></label>
           </div>
         </div>
       </div>
 
-      <div class="q-block" id="b9">
-        <label class="q-label">6. 특정 부문 전체에 공통으로 적용되는 기준인가요? <span class="required">*</span></label>
+      <div class="question-block hidden" id="block-q9">
+        <div class="question-label">6. 특정 부문 전체 공통 기준인가요? <span class="required-mark">*</span></div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="q9" value="예"> 예</label>
-          <label class="radio-opt"><input type="radio" name="q9" value="아니오"> 아니오</label>
+          <label class="radio-option"><input type="radio" name="q9" value="예"> <span>예</span></label>
+          <label class="radio-option"><input type="radio" name="q9" value="아니오"> <span>아니오</span></label>
         </div>
       </div>
 
-      <div class="q-block" id="b3">
-        <label class="q-label">7. 최종 전결권자는 누구입니까? <span class="required">*</span></label>
+      <div class="question-block hidden" id="block-q3">
+        <div class="question-label">7. 최종 전결권자는 누구인가요? <span class="required-mark">*</span></div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="q3" value="대표이사"> 대표이사</label>
-          <label class="radio-opt"><input type="radio" name="q3" value="임원"> 임원</label>
-          <label class="radio-opt"><input type="radio" name="q3" value="지점장/CM"> 지점장/CM</label>
+          <label class="radio-option"><input type="radio" name="q3" value="대표이사"> <span>대표이사</span></label>
+          <label class="radio-option"><input type="radio" name="q3" value="임원"> <span>임원</span></label>
+          <label class="radio-option"><input type="radio" name="q3" value="본부장/지점장"> <span>본부장/지점장</span></label>
         </div>
       </div>
 
-      <div class="q-block" id="b10">
-        <label class="q-label">8. 관리 부문을 선택해주세요 <span class="required">*</span></label>
+      <div class="question-block hidden" id="block-q10">
+        <div class="question-label">8. 관리 부문을 선택해주세요 <span class="required-mark">*</span></div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="q10" value="OY"> OY</label>
-          <label class="radio-opt"><input type="radio" name="q10" value="DO"> DO</label>
-          <label class="radio-opt"><input type="radio" name="q10" value="DU"> DU</label>
-          <label class="radio-opt"><input type="radio" name="q10" value="FB"> FB</label>
+          <label class="radio-option"><input type="radio" name="q10" value="OY"> <span>OY</span></label>
+          <label class="radio-option"><input type="radio" name="q10" value="DO"> <span>DO</span></label>
+          <label class="radio-option"><input type="radio" name="q10" value="FB"> <span>FB</span></label>
         </div>
       </div>
 
-      <button type="submit" class="btn-submit" id="btn-submit">번호 생성 및 제출</button>
+      <div class="btn-row" id="submit-row" style="display:none;">
+        <button type="submit" class="submit-btn" id="submit-btn">제출하기</button>
+        <span class="loading-text" id="loading-text">데이터 전송 중...</span>
+      </div>
     </form>
   </div>
+</div>
 
-  <div class="card" id="result-screen">
-    <div class="card-header">
-      <h1>✅ 생성 완료</h1>
-    </div>
-    <div id="loading-res">
+<div id="result-screen">
+  <div class="result-card">
+    <div class="result-icon">✅</div>
+    <div class="result-title">생성 완료</div>
+    <div id="result-loading" class="result-loading">
       <div class="spinner"></div>
-      <p>구글 시트에서 관리번호를 계산하고 있습니다...</p>
+      <p>관리번호를 가져오고 있습니다...</p>
     </div>
-    <div id="res-content" style="display:none;">
-      <div class="code-box">
-        <p style="color:var(--subtext); font-size:12px; margin-bottom:10px;">관리번호 기본코드</p>
-        <div class="code-val" id="res-code">---</div>
+    <div id="result-content" style="display:none;">
+      <div class="result-code-box">
+        <div class="result-code-label">관리번호 기본코드</div>
+        <div class="result-code-value" id="result-code">---</div>
       </div>
-      <table class="info-table">
-        <tr><td>문서명</td><td id="res-name"></td></tr>
-        <tr><td>전결권자</td><td id="res-approver"></td></tr>
-        <tr><td>관리부문</td><td id="res-dept"></td></tr>
+      <table class="doc-info-table">
+        <tr><td>문서명</td><td id="info-docname"></td></tr>
+        <tr><td>전결권자</td><td id="info-approver"></td></tr>
+        <tr><td>관리부문</td><td id="info-dept"></td></tr>
       </table>
-      <button onclick="location.reload()" style="margin-top:30px; background:#eee; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">새로 만들기</button>
+      <button class="new-btn" style="margin-top:20px;" onclick="location.reload()">새 문서 등록</button>
     </div>
   </div>
+</div>
 
-  <script>
-    // 1. 본인의 구글 앱 스크립트 웹 앱 URL을 여기에 넣으세요!
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw-1zqW_Ki9-621sXC9qY3hQUy1lsR76vXPOwGIBOCnIGi84KTpdPsB3rGz8OaMv94E/exec';
-    const SHEET_ID = '1ESOBsoDtIUMLkEAYkoYNUp_DrUXpZDNdWvc7AUETwWo';
-    const GID = '1997847295';
+<script>
+  // [설정] 본인의 URL로 교체하세요
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw-1zqW_Ki9-621sXC9qY3hQUy1lsR76vXPOwGIBOCnIGi84KTpdPsB3rGz8OaMv94E/exec';
+  const SHEET_ID = '1ESOBsoDtIUMLkEAYkoYNUp_DrUXpZDNdWvc7AUETwWo';
+  const GID = '1997847295';
 
-    const form = document.getElementById('main-form');
-    const pFill = document.getElementById('p-fill');
+  const form = document.getElementById('doc-form');
 
-    // 질문 로직 제어
-    form.addEventListener('change', () => {
-      const q1 = document.getElementById('q1').value;
-      const q2 = form.querySelector('input[name="q2"]:checked')?.value;
-      const q4 = form.querySelector('input[name="q4"]:checked')?.value;
-      const q8 = form.querySelector('input[name="q8"]:checked')?.value;
-      const q9 = form.querySelector('input[name="q9"]:checked')?.value;
-      const q3 = form.querySelector('input[name="q3"]:checked')?.value;
-      const q10 = form.querySelector('input[name="q10"]:checked')?.value;
+  function show(id) { 
+    const el = document.getElementById(id); 
+    el.classList.remove('hidden'); el.classList.add('visible'); 
+  }
 
-      if(q1) document.getElementById('b2').classList.add('active');
-      
-      if(q2 === '예') {
-        document.getElementById('b3').classList.add('active');
-        document.getElementById('b4').classList.remove('active');
-      } else if(q2 === '아니오') {
-        document.getElementById('b4').classList.add('active');
-      }
+  // 질문 로직
+  form.addEventListener('input', () => {
+    const q1 = document.getElementById('q1').value;
+    const q2 = form.querySelector('input[name="q2"]:checked')?.value;
+    const q4 = form.querySelector('input[name="q4"]:checked')?.value;
+    const q8 = form.querySelector('input[name="q8"]:checked')?.value;
+    const q9 = form.querySelector('input[name="q9"]:checked')?.value;
+    const q3 = form.querySelector('input[name="q3"]:checked')?.value;
+    const q10 = form.querySelector('input[name="q10"]:checked')?.value;
 
-      if(q4 === '예') {
-        document.getElementById('group-internal').style.display = 'none';
-        document.getElementById('b3').classList.add('active');
-      } else if(q4 === '아니오') {
-        document.getElementById('group-internal').style.display = 'block';
-      }
-
-      if(q8 === '예') {
-        document.getElementById('b9').classList.remove('active');
-        document.getElementById('b3').classList.add('active');
-      } else if(q8 === '아니오') {
-        document.getElementById('b9').classList.add('active');
-      }
-
-      if(q9) document.getElementById('b3').classList.add('active');
-      if(q3) document.getElementById('b10').classList.add('active');
-      if(q10) document.getElementById('btn-submit').style.display = 'block';
-
-      // 진행바 업데이트
-      const activeQs = document.querySelectorAll('.q-block.active').length;
-      pFill.style.width = (activeQs * 12.5) + '%';
-    });
-
-    // 폼 제출
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      document.getElementById('btn-submit').disabled = true;
-      document.getElementById('btn-submit').innerText = '데이터 저장 중...';
-
-      const formData = new URLSearchParams();
-      formData.append('q1', document.getElementById('q1').value);
-      ['q2','q3','q4','q5','q6','q7','q8','q9','q10'].forEach(q => {
-        const val = form.querySelector(`input[name="${q}"]:checked`)?.value || '';
-        formData.append(q, val);
-      });
-
-      try {
-        await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: formData });
-        
-        document.getElementById('form-card').style.display = 'none';
-        document.getElementById('p-wrap').style.display = 'none';
-        document.getElementById('result-screen').style.display = 'block';
-
-        // 5초 대기 후 시트에서 결과 가져오기 (수식 계산 시간)
-        setTimeout(fetchResult, 5000);
-      } catch (err) {
-        alert('전송 중 오류가 발생했습니다.');
-        document.getElementById('btn-submit').disabled = false;
-      }
-    });
-
-    async function fetchResult() {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
-      try {
-        const res = await fetch(url);
-        const text = await res.text();
-        const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-        const lastRow = json.table.rows[json.table.rows.length - 1];
-        
-        // Q열(17번째 열) 값 가져오기 (Index 16)
-        const code = lastRow.c[16]?.v || "계산 오류 (시트 확인)";
-        
-        document.getElementById('loading-res').style.display = 'none';
-        document.getElementById('res-content').style.display = 'block';
-        document.getElementById('res-code').innerText = code;
-        document.getElementById('res-name').innerText = document.getElementById('q1').value;
-        document.getElementById('res-approver').innerText = form.querySelector('input[name="q3"]:checked')?.value;
-        document.getElementById('res-dept').innerText = form.querySelector('input[name="q10"]:checked')?.value;
-      } catch (e) {
-        console.error(e);
-        setTimeout(fetchResult, 3000); // 실패 시 재시도
-      }
+    if(q1) show('block-q2');
+    
+    if(q2 === '예') {
+      show('block-q3');
+      document.getElementById('block-q4').classList.add('hidden');
+    } else if(q2 === '아니오') {
+      show('block-q4');
     }
-  </script>
+
+    if(q4 === '예') {
+      document.getElementById('internal-questions').style.display = 'none';
+      show('block-q3');
+    } else if(q4 === '아니오') {
+      document.getElementById('internal-questions').style.display = 'block';
+    }
+
+    if(q8 === '예') {
+      document.getElementById('block-q9').classList.add('hidden');
+      show('block-q3');
+    } else if(q8 === '아니오') {
+      show('block-q9');
+    }
+
+    if(q9) show('block-q3');
+    if(q3) show('block-q10');
+    if(q10) document.getElementById('submit-row').style.display = 'flex';
+
+    // 진행률 계산
+    const totalSteps = 8;
+    const visibleCount = document.querySelectorAll('.question-block.visible:not(.hidden)').length;
+    document.getElementById('progress-bar').style.width = (visibleCount / totalSteps * 100) + '%';
+    document.getElementById('progress-label').textContent = visibleCount + ' / ' + totalSteps + ' 단계';
+  });
+
+  // 제출
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('loading-text').style.display = 'inline';
+
+    const formData = new URLSearchParams();
+    const data = new FormData(form);
+    for (const [key, value] of data) { formData.append(key, value); }
+    formData.append('q1', document.getElementById('q1').value);
+
+    try {
+      await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: formData });
+      document.getElementById('form-screen').style.display = 'none';
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+      setTimeout(fetchResult, 5000); // 5초 대기 후 시트 값 가져오기
+    } catch (err) {
+      alert('전송 오류 발생');
+    }
+  });
+
+  async function fetchResult() {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+    try {
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+      const lastRow = json.table.rows[json.table.rows.length - 1];
+      
+      // Q열(index 16)에서 관리번호 추출
+      const code = lastRow.c[16]?.v || "생성중...";
+      
+      document.getElementById('result-loading').style.display = 'none';
+      document.getElementById('result-content').style.display = 'block';
+      document.getElementById('result-code').textContent = code;
+      document.getElementById('info-docname').textContent = document.getElementById('q1').value;
+      document.getElementById('info-approver').textContent = form.querySelector('input[name="q3"]:checked')?.value || '-';
+      document.getElementById('info-dept').textContent = form.querySelector('input[name="q10"]:checked')?.value || '-';
+    } catch (e) {
+      setTimeout(fetchResult, 3000);
+    }
+  }
+</script>
 </body>
 </html>
