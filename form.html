@@ -115,16 +115,17 @@
   const form = document.getElementById('doc-form');
   const q1Input = document.getElementById('q1');
 
+  // 숨김 처리 시 내부 입력값도 초기화
+  function clearInputs(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    el.querySelectorAll('select').forEach(s => s.value = '');
+  }
+
   // 화면 전환 로직 함수
   function updateFlow() {
-    const fd = new FormData(form);
     const q1 = q1Input.value.trim();
-    const q2 = fd.get('q2');
-    const q3 = fd.get('q3');
-    const q4 = fd.get('q4');
-    const q8 = fd.get('q8');
-    const q9 = fd.get('q9');
-    const q10 = fd.get('q10');
 
     // 1 -> 2
     if(q1) {
@@ -132,37 +133,65 @@
       document.getElementById('info-q2').classList.replace('hidden', 'visible');
     }
 
+    const q2 = new FormData(form).get('q2');
+
     // 2번 분기
     if(q2 === '예') {
       document.getElementById('block-q4').classList.replace('hidden', 'visible');
       document.getElementById('block-q3').className = 'question-block hidden';
+      clearInputs('block-q3');
       document.getElementById('group-internal').className = 'hidden';
+      clearInputs('group-internal');
+      document.getElementById('block-q9').className = 'question-block hidden';
+      clearInputs('block-q9');
     } else if(q2 === '아니오') {
       document.getElementById('block-q3').classList.replace('hidden', 'visible');
       document.getElementById('block-q4').className = 'question-block hidden';
+      clearInputs('block-q4');
     }
+
+    const q3 = new FormData(form).get('q3');
+    const q4 = new FormData(form).get('q4');
 
     // 3번 분기
     if(q2 === '아니오' && q3 === '예') {
-      document.getElementById('block-q10').classList.replace('hidden', 'visible');
       document.getElementById('group-internal').className = 'hidden';
+      clearInputs('group-internal');
+      document.getElementById('block-q9').className = 'question-block hidden';
+      clearInputs('block-q9');
     } else if(q2 === '아니오' && q3 === '아니오') {
       document.getElementById('group-internal').className = 'visible';
     }
 
+    const q8 = new FormData(form).get('q8');
+
     // 8 -> 9
-    if(q8 === "아니오") {
-        document.getElementById('block-q9').classList.replace('hidden', 'visible');
+    if(q8 === '아니오') {
+      document.getElementById('block-q9').classList.replace('hidden', 'visible');
+    } else if(q8 === '예') {
+      document.getElementById('block-q9').className = 'question-block hidden';
+      clearInputs('block-q9');
     }
-    
 
-    // 최종 10번 노출 조건
-    if(q4 || (q2 === '아니오' && q3 === '예') || (q8 === '예') || q9) {
+    const q9 = new FormData(form).get('q9');
+
+    // 최종 10번 노출 조건 (show/hide 모두 처리)
+    const showQ10 = q4 || (q2 === '아니오' && q3 === '예') || (q8 === '예') || q9;
+    if(showQ10) {
       document.getElementById('block-q10').classList.replace('hidden', 'visible');
+    } else {
+      document.getElementById('block-q10').className = 'question-block hidden';
+      clearInputs('block-q10');
     }
 
-    // 제출 버튼
-    if(q10) document.getElementById('submit-area').classList.replace('hidden', 'visible');
+    const q10 = new FormData(form).get('q10');
+
+    // 제출 버튼 (show/hide 모두 처리)
+    if(q10) {
+      document.getElementById('submit-area').classList.replace('hidden', 'visible');
+    } else {
+      document.getElementById('submit-area').className = 'hidden';
+    }
   }
 
   form.addEventListener('input', updateFlow);
