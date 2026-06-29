@@ -135,13 +135,11 @@
     // 2번 분기
     if(q2 === '예') {
       document.getElementById('block-q4').classList.replace('hidden', 'visible');
-      document.getElementById('info-q4').classList.replace('hidden', 'visible');
       document.getElementById('block-q3').className = 'question-block hidden';
       document.getElementById('group-internal').className = 'hidden';
     } else if(q2 === '아니오') {
       document.getElementById('block-q3').classList.replace('hidden', 'visible');
       document.getElementById('block-q4').className = 'question-block hidden';
-      document.getElementById('info-q4').className = 'info-box hidden';
     }
 
     // 3번 분기
