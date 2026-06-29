@@ -84,6 +84,12 @@
         <label class="radio-option"><input type="radio" name="q4" value="CM, 지점장 등"> CM, 지점장 등</label>
       </div>
 
+      <div class="info-box hidden" id="info-q4">
+        <div class="info-body">
+          <p>항공당국 승인 대상 문서의 경우 대표이사 전결 선택</p>
+        </div>
+      </div>
+
       <div class="question-block hidden" id="block-q10">
         <label class="question-label">관리 부문을 선택하세요 *</label>
         <select name="q10" id="q10" style="width:100%; padding:8px;">
@@ -135,11 +141,13 @@
     // 2번 분기
     if(q2 === '예') {
       document.getElementById('block-q4').classList.replace('hidden', 'visible');
+      document.getElementById('info-q4').classList.replace('hidden', 'visible');
       document.getElementById('block-q3').className = 'question-block hidden';
       document.getElementById('group-internal').className = 'hidden';
     } else if(q2 === '아니오') {
       document.getElementById('block-q3').classList.replace('hidden', 'visible');
       document.getElementById('block-q4').className = 'question-block hidden';
+      document.getElementById('info-q4').className = 'info-box hidden';
     }
 
     // 3번 분기
